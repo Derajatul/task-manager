@@ -6,60 +6,40 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "src/app/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String    // hashed
-  role      Role      @default(USER)
-  tasks     Task[]    @relation("AssignedTasks")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
 
+// Definisikan model Task di sini.
+// Model ini akan dipetakan ke sebuah tabel bernama "Task" di database Anda.
 model Task {
-  id          String     @id @default(uuid())
+  // 'id' adalah primary key dari tabel.
+  // '@id' menandakan bahwa ini adalah primary key.
+  // 'default(uuid())' berarti bahwa nilai default akan dibuat secara otomatis
+  // menggunakan fungsi uuid() saat data baru dibuat.
+  id          String   @id @default(uuid())
+
+  // 'title' adalah kolom untuk menyimpan judul task.
+  // Ini adalah kolom String dan wajib diisi.
   title       String
+
+  // 'description' adalah kolom untuk menyimpan deskripsi task.
+  // Tanda tanya (?) setelah tipe data String menandakan bahwa kolom ini opsional.
   description String?
-  status      TaskStatus @default(PENDING)
-  dueDate     DateTime?
-  priority    Priority   @default(MEDIUM)
 
-  assignedTo  User?      @relation("AssignedTasks", fields: [assignedToId], references: [id])
-  assignedToId String?
+  // 'completed' adalah kolom boolean untuk menandakan apakah task sudah selesai atau belum.
+  // 'default(false)' berarti nilai defaultnya adalah false.
+  completed   Boolean  @default(false)
 
-  tags        Tag[]      @relation("TaskTags")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-}
+  // 'createdAt' akan secara otomatis diisi dengan tanggal dan waktu saat task dibuat.
+  // '@default(now())' menggunakan fungsi now() untuk mendapatkan waktu saat ini.
+  createdAt   DateTime @default(now())
 
-model Tag {
-  id      String   @id @default(uuid())
-  name    String   @unique
-  tasks   Task[]   @relation("TaskTags")
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  ARCHIVED
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
+  // 'updatedAt' akan secara otomatis diperbarui dengan tanggal dan waktu saat task diubah.
+  // '@updatedAt' adalah atribut khusus dari Prisma untuk menangani ini.
+  updatedAt   DateTime @updatedAt
 }
